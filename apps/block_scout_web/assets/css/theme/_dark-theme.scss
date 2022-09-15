@@ -51,7 +51,7 @@ $header-links-background-color-dark-mode: $dark-light !default;
 		}
 	}
 	.navbar-brand .navbar-logo {
-		filter: brightness(0) invert(1);
+		filter: brightness(1) invert(1);
 	}
 	.navbar.navbar-primary .navbar-nav .nav-link {
 		color: $labels-dark;
