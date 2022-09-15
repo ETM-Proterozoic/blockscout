@@ -9,26 +9,17 @@ defmodule BlockScoutWeb.LayoutView do
 
   @default_other_networks [
     %{
-      title: "POA",
-      url: "https://blockscout.com/poa/core"
+      title: "ETMP Mainnet",
+      url: "https://etmscan.network"
     },
     %{
-      title: "Sokol",
-      url: "https://blockscout.com/poa/sokol",
+      title: "ETMP Testnet",
+      url: "https://pioneer.etmscan.network",
       test_net?: true
     },
     %{
       title: "Gnosis Chain",
-      url: "https://blockscout.com/xdai/mainnet"
-    },
-    %{
-      title: "Ethereum Classic",
-      url: "https://blockscout.com/etc/mainnet",
-      other?: true
-    },
-    %{
-      title: "RSK",
-      url: "https://blockscout.com/rsk/mainnet",
+      url: "https://blockscout.com/xdai/mainnet",
       other?: true
     }
   ]
