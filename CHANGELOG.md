@@ -2,6 +2,8 @@
 
 ### Features
 
+- [#6324](https://github.com/blockscout/blockscout/pull/6324) - Add verified contracts list page
+- [#6379](https://github.com/blockscout/blockscout/pull/6379) - API v2 for frontend
 - [#6351](https://github.com/blockscout/blockscout/pull/6351) - Enable forum link env var
 - [#6316](https://github.com/blockscout/blockscout/pull/6316) - Copy public tags functionality to master
 - [#6196](https://github.com/blockscout/blockscout/pull/6196) - INDEXER_CATCHUP_BLOCKS_BATCH_SIZE and INDEXER_CATCHUP_BLOCKS_CONCURRENCY env varaibles
@@ -15,6 +17,7 @@
 
 ### Fixes
 
+- [#6390](https://github.com/blockscout/blockscout/pull/6390) - Fix transactions responses in API v2
 - [#6357](https://github.com/blockscout/blockscout/pull/6357) - Fix definitions of NETWORK_PATH, API_PATH, SOCKET_ROOT: process trailing slash
 - [#6338](https://github.com/blockscout/blockscout/pull/6338) - Fix token search with space
 - [#6329](https://github.com/blockscout/blockscout/pull/6329) - Prevent logger from truncating response from rust verifier service in case of an error
@@ -129,6 +132,7 @@
 - [#5968](https://github.com/blockscout/blockscout/pull/5968) - Add call type in the response of txlistinternal API method
 - [#5860](https://github.com/blockscout/blockscout/pull/5860) - Integrate rust verifier micro-service ([blockscout-rs/verifier](https://github.com/blockscout/blockscout-rs/tree/main/verification))
 - [#6001](https://github.com/blockscout/blockscout/pull/6001) - Add ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES env var that filters requests and query node only if the block quantity is "latest"
+- [#5944](https://github.com/blockscout/blockscout/pull/5944) - Add tab with state changes to transaction page
 
 ### Fixes
 
