@@ -119,6 +119,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
           fetch_block_internal_transactions_by_transactions(filtered_unique_numbers, json_rpc_named_arguments)
         rescue
           error ->
+            Logger.error(fn -> ["0failed to fetch internal transactions for blocks: ",Enum.join(filtered_unique_numbers, ", "),Enum.join(json_rpc_named_arguments, ", ")] end,
+              error_count: 1
+            )
             {:error, error, __STACKTRACE__}
         end
     end
@@ -205,6 +208,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
             try do
               EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
             catch
+              Logger.error(fn -> ["1failed to fetch internal transactions for blocks: ",Enum.join(transactions, ", "),Enum.join(json_rpc_named_arguments, ", ")] end,
+              error_count: 1
+              )
               :exit, error ->
                 {:error, error, __STACKTRACE__}
             end
