@@ -9,11 +9,11 @@ defmodule BlockScoutWeb.LayoutView do
 
   @default_other_networks [
     %{
-      title: "ETMP Mainnet",
+      title: "ETM/P Mainnet",
       url: "https://etmscan.network"
     },
     %{
-      title: "ETMP Testnet",
+      title: "ETM/P Testnet",
       url: "https://pioneer.etmscan.network",
       test_net?: true
     },
