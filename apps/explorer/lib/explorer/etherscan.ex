@@ -443,7 +443,7 @@ defmodule Explorer.Etherscan do
   )a
 
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
-    filter_by_to = options.filter_by == "to"
+    filter_by_to = if Map.has_key?(options,:filter_by), do: options.filter_by == "to", else:false
     tt_query =
       from(
         tt in TokenTransfer,
