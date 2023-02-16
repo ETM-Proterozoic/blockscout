@@ -442,10 +442,11 @@ defmodule Explorer.Etherscan do
   )a
 
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
-    filter_by_to = false
-    if Map.has_key?(options,:filter_by) do
-      ^filter_by_to = options.filter_by == "to"
-    end
+    filter_by_to =
+      case Map.get(options, :filter_by) do
+        "to" -> true
+        _ -> false
+      end
     tt_query =
       from(
         tt in TokenTransfer,
