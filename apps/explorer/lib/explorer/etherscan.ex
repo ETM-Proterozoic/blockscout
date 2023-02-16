@@ -444,7 +444,7 @@ defmodule Explorer.Etherscan do
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
     filter_by_to = false
     if Map.has_key?(options,:filter_by) do
-      filter_by_to = options.filter_by == "to"
+      ^filter_by_to = ^options.filter_by == "to"
     end
     tt_query =
       from(
