@@ -442,11 +442,12 @@ defmodule Explorer.Etherscan do
   )a
 
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
+    filter_by_to = options.filter_by == "to"
     tt_query =
       from(
         tt in TokenTransfer,
         inner_join: tkn in assoc(tt, :token),
-        where: tt.from_address_hash == ^address_hash,
+        where: filter_by_to || tt.from_address_hash == ^address_hash,
         or_where: tt.to_address_hash == ^address_hash,
         order_by: [{^options.order_by_direction, tt.block_number}, {^options.order_by_direction, tt.log_index}],
         limit: ^options.page_size,
