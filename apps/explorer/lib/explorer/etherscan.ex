@@ -447,7 +447,7 @@ defmodule Explorer.Etherscan do
       from(
         tt in TokenTransfer,
         inner_join: tkn in assoc(tt, :token),
-        where: filter_by_to || tt.from_address_hash == ^address_hash,
+        where: filter_by_to or tt.from_address_hash == ^address_hash,
         or_where: tt.to_address_hash == ^address_hash,
         order_by: [{^options.order_by_direction, tt.block_number}, {^options.order_by_direction, tt.log_index}],
         limit: ^options.page_size,
