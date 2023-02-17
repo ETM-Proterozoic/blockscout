@@ -346,7 +346,11 @@ defmodule Explorer.Etherscan do
     results_tokenids = if length(results)>0, do: x_tokenids, else: %{}
     results_with_tokenids = results
     |> Enum.map(fn result ->
-      %{result | tokenIds: results_tokenids[result.contract_address_hash]}
+      if Map.has_key?(results_tokenids,result.contract_address_hash) do
+        %{result | tokenIds: results_tokenids[result.contract_address_hash]}
+      else
+        %{result | tokenIds: []}
+      end
     end)
 
     results_with_tokenids
