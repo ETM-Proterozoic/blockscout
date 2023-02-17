@@ -351,7 +351,10 @@ defmodule Explorer.Etherscan do
     results_with_tokenids
   end
 
-  def list_token_tokenids(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash, contract_addresses = []) do
+  def list_token_tokenids(address_hash, contract_addresses) do
+    if length(contract_addresses)==0 do
+      return []
+    end
     sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
     FROM (
     SELECT DISTINCT ON (token_id, token_contract_address_hash)
