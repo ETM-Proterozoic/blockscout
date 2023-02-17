@@ -366,7 +366,7 @@ defmodule Explorer.Etherscan do
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
       ) subquery where to_address_hash = $2
       GROUP BY token_contract_address_hash"
-      SQL.query!(Repo,sql_query,[contract_addresses,address_hash])
+      SQL.query!(Repo,sql_query,[contract_addresses,to_string(address_hash)])
     end
   end
 
