@@ -337,7 +337,30 @@ defmodule Explorer.Etherscan do
         }
       )
 
-    Repo.replica().all(query)
+    results = Repo.replica().all(query)
+
+    results_tokenids = if Map.size(results)>0,do: list_tokens(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))),else:%{}
+    results_with_tokenids = results
+    |> Enum.map(fn result ->
+      %{result | tokenIds: results_tokenids[result.contract_address_hash]}
+    end)
+
+    results_with_tokenids
+  end
+
+  def list_tokens(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash,list(Hash.Address.t()) = contract_addresses) do
+    sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
+    FROM (
+    SELECT DISTINCT ON (token_id, token_contract_address_hash)
+      transaction_hash, log_index, from_address_hash, to_address_hash, amount,
+      token_contract_address_hash, inserted_at, updated_at, block_number, block_hash, amounts,
+      token_ids[i] AS token_id
+    FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
+    where token_contract_address_hash = ANY($1)
+    ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
+    ) subquery where to_address_hash = $2
+    GROUP BY token_contract_address_hash"
+    SQL.query!(Repo,sql_query,[contract_addresses,address_hash])
   end
 
   @transaction_fields ~w(
