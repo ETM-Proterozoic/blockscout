@@ -7,6 +7,8 @@ defmodule Explorer.Etherscan do
   import Explorer.Chain.SmartContract, only: [burn_address_hash_string: 0]
   import Map
 
+  require Logger
+
   alias Ecto.Adapters.SQL
   alias Explorer.Repo
   alias Explorer.Etherscan.Logs
