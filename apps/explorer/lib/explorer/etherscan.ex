@@ -366,7 +366,12 @@ defmodule Explorer.Etherscan do
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
       ) subquery where to_address_hash = decode($2, 'base64')
       GROUP BY token_contract_address_hash"
-      SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
+      result = SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
+      result
+      |> Postgrex.Result.to_list()
+      |> Enum.reduce(Map.new(), fn {token_contract_address_hash, token_ids}, acc ->
+        Map.update(acc, token_contract_address_hash, token_ids, &[token_ids | &1])
+      end)
     end
   end
 
