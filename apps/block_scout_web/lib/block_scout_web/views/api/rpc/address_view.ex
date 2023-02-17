@@ -211,7 +211,7 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
       "name" => token.name,
       "decimals" => to_string(token.decimals),
       "symbol" => token.symbol,
-      "type" => token.type
+      "type" => token.type,
       "tokenIds" => to_string(token.token_ids),
     }
     |> (&if(is_nil(token.id), do: &1, else: Map.put(&1, "id", token.id))).()
