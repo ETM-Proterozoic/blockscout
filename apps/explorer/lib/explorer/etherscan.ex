@@ -6,6 +6,8 @@ defmodule Explorer.Etherscan do
   import Ecto.Query, only: [from: 2, where: 3, or_where: 3, union: 2, subquery: 1, order_by: 3]
   import Explorer.Chain.SmartContract, only: [burn_address_hash_string: 0]
 
+  alias Ecto.Adapters.SQL
+  alias Explorer.Repo
   alias Explorer.Etherscan.Logs
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
@@ -339,7 +341,7 @@ defmodule Explorer.Etherscan do
 
     results = Repo.replica().all(query)
 
-    results_tokenids = if Map.size(results)>0, do: list_token_tokenids(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))), else: %{}
+    results_tokenids = if Kernel.map_size(results)>0, do: list_token_tokenids(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))), else: %{}
     results_with_tokenids = results
     |> Enum.map(fn result ->
       %{result | tokenIds: results_tokenids[result.contract_address_hash]}
