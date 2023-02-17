@@ -343,7 +343,11 @@ defmodule Explorer.Etherscan do
       )
 
     results = Repo.replica().all(query)
-    Logger.error(fn -> ["api result 0: ", results] end)
+    if results do
+      Logger.error(fn -> ["api 0: ", inspect(results)] end)
+    else
+      Logger.error("api 0: results is nil")
+    end
     results_contracts = results |> Enum.map(& &1.contract_address_hash) |> Enum.into([])
     x_tokenids = list_token_tokenids(address_hash,results_contracts)
     results_tokenids = if length(results)>0, do: x_tokenids, else: %{}
@@ -354,7 +358,11 @@ defmodule Explorer.Etherscan do
         %{result | tokenIds: results_tokenids[result.contract_address_hash]}
       end
     end)
-    Logger.error(fn -> ["api result 1: ", results_with_tokenids] end)
+    if results do
+      Logger.error(fn -> ["api 1: ", inspect(results_with_tokenids)] end)
+    else
+      Logger.error("api 1: results is nil")
+    end
     results_with_tokenids
   end
 
