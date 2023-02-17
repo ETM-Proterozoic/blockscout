@@ -340,7 +340,7 @@ defmodule Explorer.Etherscan do
 
     results = Repo.replica().all(query)
 
-    results_tokenids = if Map.size(results)>0, do: list_tokens(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))), else: %{}
+    results_tokenids = if Map.size(results)>0, do: list_token_tokenids(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))), else: %{}
     results_with_tokenids = results
     |> Enum.map(fn result ->
       %{result | tokenIds: results_tokenids[result.contract_address_hash]}
@@ -349,7 +349,7 @@ defmodule Explorer.Etherscan do
     results_with_tokenids
   end
 
-  def list_tokens(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash,list(Hash.Address.t()) = contract_addresses) do
+  def list_token_tokenids(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash, contract_addresses = []) do
     sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
     FROM (
     SELECT DISTINCT ON (token_id, token_contract_address_hash)
