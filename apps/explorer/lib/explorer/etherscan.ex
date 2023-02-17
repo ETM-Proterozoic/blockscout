@@ -370,11 +370,11 @@ defmodule Explorer.Etherscan do
       GROUP BY token_contract_address_hash"
 
       result = SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
-      rows = Postgrex.Result.rows(result)
+      rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
-        token_contract_address_hash = row[0]
-        token_ids = row[1]
+        token_contract_address_hash = row["token_contract_address_hash"]
+        token_ids = row["token_ids"]
 
         %{acc | token_contract_address_hash => token_ids}
       end)
