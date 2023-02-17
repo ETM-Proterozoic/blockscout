@@ -353,20 +353,21 @@ defmodule Explorer.Etherscan do
 
   def list_token_tokenids(address_hash, contract_addresses) do
     if length(contract_addresses)==0 do
-      return []
-    end
-    sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
-    FROM (
-    SELECT DISTINCT ON (token_id, token_contract_address_hash)
+      []
+    else
+      sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
+      FROM (
+      SELECT DISTINCT ON (token_id, token_contract_address_hash)
       transaction_hash, log_index, from_address_hash, to_address_hash, amount,
       token_contract_address_hash, inserted_at, updated_at, block_number, block_hash, amounts,
       token_ids[i] AS token_id
-    FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
-    where token_contract_address_hash = ANY($1)
-    ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
-    ) subquery where to_address_hash = $2
-    GROUP BY token_contract_address_hash"
-    SQL.query!(Repo,sql_query,[contract_addresses,address_hash])
+      FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
+      where token_contract_address_hash = ANY($1)
+      ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
+      ) subquery where to_address_hash = $2
+      GROUP BY token_contract_address_hash"
+      SQL.query!(Repo,sql_query,[contract_addresses,address_hash])
+    end
   end
 
   @transaction_fields ~w(
