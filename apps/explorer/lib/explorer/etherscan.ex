@@ -340,7 +340,7 @@ defmodule Explorer.Etherscan do
 
     results = Repo.replica().all(query)
 
-    results_tokenids = if Map.size(results)>0,do: list_tokens(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))),else:%{}
+    results_tokenids = if Map.size(results)>0, do: list_tokens(address_hash,Enum.map(results,&Map.get(&1,:contract_address_hash))), else: %{}
     results_with_tokenids = results
     |> Enum.map(fn result ->
       %{result | tokenIds: results_tokenids[result.contract_address_hash]}
