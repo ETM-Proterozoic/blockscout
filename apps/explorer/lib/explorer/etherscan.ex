@@ -354,6 +354,7 @@ defmodule Explorer.Etherscan do
     if length(contract_addresses)==0 do
       []
     else
+      binary_contract_addresses = Enum.map(contract_addresses, &Base.encode64(&1.bytes))
       sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
       FROM (
       SELECT DISTINCT ON (token_id, token_contract_address_hash)
@@ -365,7 +366,7 @@ defmodule Explorer.Etherscan do
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
       ) subquery where to_address_hash = decode($2, 'base64')
       GROUP BY token_contract_address_hash"
-      SQL.query!(Repo,sql_query,[contract_addresses,Base.encode64(address_hash.bytes)])
+      SQL.query!(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
     end
   end
 
