@@ -369,7 +369,7 @@ defmodule Explorer.Etherscan do
       ) subquery where to_address_hash = decode($2, 'base64')
       GROUP BY token_contract_address_hash"
 
-      result = SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
+      {:ok, result} = SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
