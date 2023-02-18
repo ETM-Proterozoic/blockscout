@@ -398,7 +398,10 @@ defmodule Explorer.Etherscan do
       ) subquery where to_address_hash = $2
       GROUP BY token_contract_address_hash"
 
-      {:ok, result} = SQL.query(Repo,sql_query,[{^:array, contract_addresses},String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+      {:ok, result} = SQL.query(
+        Repo,
+        sql_query,
+        [Enum.into(categories, []) |> SQL.escape() |> SQL.query!("unnest($1)")],String.replace(to_string(address_hash),~r/^0x/, "\\x")])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
