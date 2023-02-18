@@ -423,11 +423,8 @@ defmodule Explorer.Etherscan do
         )
       rows = Repo.all(query)
       Logger.error(fn -> ["token_ids result : ", inspect(rows)] end)
-      Enum.reduce(rows, %{}, fn row, acc ->
-        token_contract_address_hash = row["token_contract_address_hash"]
-        token_ids = row["token_ids"]
-
-        %{acc | token_contract_address_hash => token_ids}
+      Enum.reduce(rows, %{}, fn %{token_contract_address_hash: hash, token_ids: ids}, acc ->
+        Map.update(acc, hash, ids, fn existing_ids -> existing_ids ++ ids end)
       end)
     end
   end
