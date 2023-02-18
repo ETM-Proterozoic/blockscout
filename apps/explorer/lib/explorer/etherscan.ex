@@ -348,7 +348,7 @@ defmodule Explorer.Etherscan do
     else
       Logger.error("api 0: results is nil")
     end
-    results_contracts = results |> Enum.map(&to_string(&1.contract_address_hash)) |> Enum.into([])
+    results_contracts = results |> Enum.map(&String.replace(to_string(&1.contract_address_hash),~r/^0x/, "\x")) |> Enum.into([])
     if results do
       Logger.error(fn -> ["api 1: ", inspect(results_contracts)] end)
     else
@@ -385,7 +385,6 @@ defmodule Explorer.Etherscan do
     if length(contract_addresses)==0 do
       []
     else
-      binary_contract_addresses = Enum.map(contract_addresses, &Base.encode64(&1.bytes))
       sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
       FROM (
       SELECT DISTINCT ON (token_id, token_contract_address_hash)
@@ -395,10 +394,10 @@ defmodule Explorer.Etherscan do
       FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
       where token_contract_address_hash = ANY($1)
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
-      ) subquery where to_address_hash = decode($2, 'base64')
+      ) subquery where to_address_hash = $2
       GROUP BY token_contract_address_hash"
 
-      {:ok, result} = SQL.query(Repo,sql_query,[binary_contract_addresses,Base.encode64(address_hash.bytes)])
+      {:ok, result} = SQL.query(Repo,sql_query,[contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\x")])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
