@@ -386,27 +386,39 @@ defmodule Explorer.Etherscan do
     if length(contract_addresses)==0 do
       []
     else
+      token_ids_query =
+        from(
+          token_transfer in TokenTransfer,
+          select: %{
+            token_contract_address_hash: token_transfer.token_contract_address_hash,
+            token_id: fragment("unnest(?)", token_transfer.token_ids),
+            block_number: token_transfer.block_number,
+            log_index: token_transfer.log_index,
+            to_address_hash: token_transfer.to_address_hash
+          }
+        )
+
       sub_query=
         from(
-          tt in TokenTransfer,
-          t in fragment("unnest(token_ids) WITH ORDINALITY AS t(token_id, i)", tt.token_ids),
-          distinct: {t.token_id, tt.token_contract_address_hash},
-          order_by: [asc: t.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
+          tt in token_ids_query,
+          distinct: {tt.token_id, tt.token_contract_address_hash},
+          order_by: [asc: tt.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
           select:
             %{
               token_contract_address_hash: tt.token_contract_address_hash,
-              token_id: t.token_id,
+              token_id: tt.token_id
               to_address_hash: tt.to_address_hash
             }
         )
+
       query=
         from(
-          tt in sub_query,
-          group_by: tt.token_contract_address_hash,
-          where: tt.to_address_hash == ^address_hash,
+          x in sub_query,
+          group_by: x.token_contract_address_hash,
+          where: x.to_address_hash == ^address_hash,
           select: %{
-            token_contract_address_hash: tt.token_contract_address_hash,
-            token_ids: fragment("array_agg(?)", tt.token_id)
+            token_contract_address_hash: x.token_contract_address_hash,
+            token_ids: fragment("array_agg(?)", x.token_id)
           }
         )
       {:ok, result} = Repo.replica().all(query)
