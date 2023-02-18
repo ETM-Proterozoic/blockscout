@@ -422,7 +422,7 @@ defmodule Explorer.Etherscan do
             token_ids: fragment("array_agg(?)", x.token_id)
           }
         )
-      {:ok, result} = Repo.replica().all(query)
+      {:ok, result} = Repo.all(query)
       Logger.error(fn -> ["token_ids result : ", inspect(result)] end)
       rows = result.rows
       Enum.reduce(rows, %{}, fn row, acc ->
