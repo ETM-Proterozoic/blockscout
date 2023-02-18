@@ -344,30 +344,10 @@ defmodule Explorer.Etherscan do
       )
 
     results = Repo.replica().all(query)
-    if results do
-      Logger.error(fn -> ["api 0: ", inspect(results)] end)
-    else
-      Logger.error("api 0: results is nil")
-    end
 
     results_contracts = results |> Enum.map(&to_string(&1.contract_address_hash)) |> Enum.into([])
-    if results do
-      Logger.error(fn -> ["api 1: ", inspect(results_contracts)] end)
-    else
-      Logger.error("api 1: results is nil")
-    end
     x_tokenids = list_token_tokenids2(address_hash,results_contracts)
-    if results do
-      Logger.error(fn -> ["api 2: ", inspect(x_tokenids)] end)
-    else
-      Logger.error("api 2: results is nil")
-    end
     results_tokenids = if length(results)>0, do: x_tokenids, else: %{}
-    if results do
-      Logger.error(fn -> ["api 3: ", inspect(results_tokenids)] end)
-    else
-      Logger.error("api 3: results is nil")
-    end
     results_with_tokenids = results
     |> Enum.map(fn result ->
       result = Map.put(result, :token_ids, [])
@@ -375,11 +355,7 @@ defmodule Explorer.Etherscan do
         %{result | token_ids: results_tokenids[result.contract_address_hash]}
       end
     end)
-    if results do
-      Logger.error(fn -> ["api 4: ", inspect(results_with_tokenids)] end)
-    else
-      Logger.error("api 4: results is nil")
-    end
+
     results_with_tokenids
   end
 
@@ -423,10 +399,11 @@ defmodule Explorer.Etherscan do
           }
         )
       rows = Repo.all(query)
-      Logger.error(fn -> ["token_ids result : ", inspect(rows)] end)
+
       Enum.reduce(rows, %{}, fn %{token_contract_address_hash: hash, token_ids: ids}, acc ->
         Map.update(acc, hash, ids, fn existing_ids -> existing_ids ++ ids end)
       end)
+
     end
   end
 
@@ -449,15 +426,14 @@ defmodule Explorer.Etherscan do
       {:ok, result} = SQL.query(
         Repo,
         sql_query,
-        [contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+        [contract_addresses,to_string(address_hash)])
       Logger.error(fn -> ["token_ids result : ", inspect(result)] end)
       rows = result.rows
-      Enum.reduce(rows, %{}, fn row, acc ->
-        token_contract_address_hash = row["token_contract_address_hash"]
-        token_ids = row["token_ids"]
 
-        %{acc | token_contract_address_hash => token_ids}
+      Enum.reduce(rows, %{}, fn %{token_contract_address_hash: hash, token_ids: ids}, acc ->
+        Map.update(acc, hash, ids, fn existing_ids -> existing_ids ++ ids end)
       end)
+
     end
   end
 
