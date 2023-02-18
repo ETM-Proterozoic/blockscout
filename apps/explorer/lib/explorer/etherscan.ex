@@ -392,12 +392,12 @@ defmodule Explorer.Etherscan do
       token_contract_address_hash, inserted_at, updated_at, block_number, block_hash, amounts,
       token_ids[i] AS token_id
       FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
-      where token_contract_address_hash in ($1)
+      where token_contract_address_hash = ANY($1)
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
       ) subquery where to_address_hash = $2
       GROUP BY token_contract_address_hash"
 
-      {:ok, result} = SQL.query(Repo,sql_query,[contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+      {:ok, result} = SQL.query(Repo,sql_query,[{^:array, contract_addresses},String.replace(to_string(address_hash),~r/^0x/, "\\x")])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
