@@ -5,7 +5,6 @@ defmodule Explorer.Etherscan do
 
   import Ecto.Query, only: [from: 2, where: 3, or_where: 3, union: 2, subquery: 1, order_by: 3]
   import Map
-  import Ecto.SQL
 
   require Logger
 
@@ -16,7 +15,6 @@ defmodule Explorer.Etherscan do
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
   alias Explorer.Chain.{Address, Block, Hash, InternalTransaction, TokenTransfer, Transaction}
   alias Explorer.Chain.Transaction.History.TransactionStats
-  alias Ecto.SQL
 
   @default_options %{
     order_by_direction: :desc,
@@ -403,7 +401,7 @@ defmodule Explorer.Etherscan do
       {:ok, result} = SQL.query(
         Repo,
         sql_query,
-        [fragment("$1",contract_addresses),String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+        [contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
