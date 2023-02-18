@@ -401,7 +401,7 @@ defmodule Explorer.Etherscan do
       {:ok, result} = SQL.query(
         Repo,
         sql_query,
-        [Enum.into(categories, []) |> SQL.escape() |> SQL.query!("unnest($1)"),String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+        [Enum.into(contract_addresses, []) |> SQL.escape() |> SQL.query!("unnest($1)"),String.replace(to_string(address_hash),~r/^0x/, "\\x")])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
