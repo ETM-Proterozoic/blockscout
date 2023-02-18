@@ -3,7 +3,7 @@ defmodule Explorer.Etherscan do
   The etherscan context.
   """
 
-  import Ecto.Query, only: [from: 2, where: 3, or_where: 3, union: 2, subquery: 1, order_by: 3]
+  import Ecto.Query
   import Map
 
   require Logger
@@ -390,7 +390,7 @@ defmodule Explorer.Etherscan do
       sub_query=
         from(
           tt in TokenTransfer,
-          unnest: {tt.token_ids, :t, :i},
+          join: t in fragment("unnest(?, ?, ?)", [tt.token_ids, :t, :i]),
           distinct: {t.token_id, tt.token_contract_address_hash},
           order_by: [asc: t.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
           select:
