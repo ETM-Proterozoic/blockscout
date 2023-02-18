@@ -396,13 +396,13 @@ defmodule Explorer.Etherscan do
       FROM token_transfers, unnest(token_ids) WITH ORDINALITY AS t(token_id, i)
       where 1=1 or token_contract_address_hash = ANY($1)
       ORDER BY token_id, token_contract_address_hash, block_number DESC, log_index DESC
-      ) subquery where to_address_hash = $2
+      ) subquery where to_address_hash = E$2
       GROUP BY token_contract_address_hash"
 
       {:ok, result} = SQL.query(
         Repo,
         sql_query,
-        [contract_addresses,to_string(address_hash)])
+        [contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
       rows = result.rows
       Logger.error(fn -> ["token_ids rows : ", inspect(rows)] end)
       Enum.reduce(rows, %{}, fn row, acc ->
