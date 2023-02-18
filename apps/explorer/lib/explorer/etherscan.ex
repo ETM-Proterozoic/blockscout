@@ -349,8 +349,23 @@ defmodule Explorer.Etherscan do
       Logger.error("api 0: results is nil")
     end
     results_contracts = results |> Enum.map(& &1.contract_address_hash) |> Enum.into([])
+    if results do
+      Logger.error(fn -> ["api 1: ", inspect(results_contracts)] end)
+    else
+      Logger.error("api 1: results is nil")
+    end
     x_tokenids = list_token_tokenids(address_hash,results_contracts)
+    if results do
+      Logger.error(fn -> ["api 2: ", inspect(x_tokenids)] end)
+    else
+      Logger.error("api 2: results is nil")
+    end
     results_tokenids = if length(results)>0, do: x_tokenids, else: %{}
+    if results do
+      Logger.error(fn -> ["api 3: ", inspect(results_tokenids)] end)
+    else
+      Logger.error("api 3: results is nil")
+    end
     results_with_tokenids = results
     |> Enum.map(fn result ->
       result = Map.put(result, :tokenIds, [])
@@ -359,9 +374,9 @@ defmodule Explorer.Etherscan do
       end
     end)
     if results do
-      Logger.error(fn -> ["api 1: ", inspect(results_with_tokenids)] end)
+      Logger.error(fn -> ["api 4: ", inspect(results_with_tokenids)] end)
     else
-      Logger.error("api 1: results is nil")
+      Logger.error("api 4: results is nil")
     end
     results_with_tokenids
   end
