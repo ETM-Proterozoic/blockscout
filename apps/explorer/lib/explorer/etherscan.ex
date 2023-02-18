@@ -407,7 +407,7 @@ defmodule Explorer.Etherscan do
           where: tt.to_address_hash == ^address_hash,
           select: %{
             token_contract_address_hash: tt.token_contract_address_hash,
-            token_ids: array_agg(tt.token_id)
+            token_ids: fragment("array_agg(?)", tt.token_id)
           }
         )
       {:ok, result} = Repo.replica().all(query)
