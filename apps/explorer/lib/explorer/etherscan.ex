@@ -390,8 +390,7 @@ defmodule Explorer.Etherscan do
       sub_query=
         from(
           tt in TokenTransfer,
-          join: t in fragment("unnest(?::integer[], ?, ?)", [tt.token_ids, :t, :i]),
-          on: t.i == tt.token_id,
+          join: t in fragment("unnest(token_ids) WITH ORDINALITY AS t(token_id, i)", tt.token_ids),
           distinct: {t.token_id, tt.token_contract_address_hash},
           order_by: [asc: t.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
           select:
