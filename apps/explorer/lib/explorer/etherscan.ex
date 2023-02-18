@@ -402,8 +402,8 @@ defmodule Explorer.Etherscan do
         Repo,
         sql_query,
         [contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+      Logger.error(fn -> ["token_ids result : ", inspect(rows)] end)
       rows = result.rows
-      Logger.error(fn -> ["token_ids rows : ", inspect(rows)] end)
       Enum.reduce(rows, %{}, fn row, acc ->
         token_contract_address_hash = row["token_contract_address_hash"]
         token_ids = row["token_ids"]
