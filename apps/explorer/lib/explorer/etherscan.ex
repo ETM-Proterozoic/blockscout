@@ -407,7 +407,7 @@ defmodule Explorer.Etherscan do
           select:
             %{
               token_contract_address_hash: tt.token_contract_address_hash,
-              token_id: tt.token_id
+              token_id: tt.token_id,
               to_address_hash: tt.to_address_hash
             }
         )
