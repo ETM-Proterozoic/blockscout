@@ -17,6 +17,7 @@ defmodule Explorer.Etherscan do
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
   alias Explorer.Chain.{Address, Block, Hash, InternalTransaction, TokenTransfer, Transaction}
   alias Explorer.Chain.Transaction.History.TransactionStats
+  alias Ecto.SQL
 
   @default_options %{
     order_by_direction: :desc,
