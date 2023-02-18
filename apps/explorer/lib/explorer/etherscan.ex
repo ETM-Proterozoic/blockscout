@@ -371,7 +371,7 @@ defmodule Explorer.Etherscan do
     |> Enum.map(fn result ->
       result = Map.put(result, :tokenIds, [])
       if Map.has_key?(results_tokenids,result.contract_address_hash) do
-        %{result | tokenIds: results_tokenids[result.contract_address_hash]}
+        %{result | token_ids: results_tokenids[result.contract_address_hash]}
       end
     end)
     if results do
