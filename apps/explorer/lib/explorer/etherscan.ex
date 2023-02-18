@@ -356,7 +356,7 @@ defmodule Explorer.Etherscan do
     else
       Logger.error("api 1: results is nil")
     end
-    x_tokenids = list_token_tokenids(address_hash,results_contracts)
+    x_tokenids = list_token_tokenids2(address_hash,results_contracts)
     if results do
       Logger.error(fn -> ["api 2: ", inspect(x_tokenids)] end)
     else
@@ -381,6 +381,45 @@ defmodule Explorer.Etherscan do
       Logger.error("api 4: results is nil")
     end
     results_with_tokenids
+  end
+
+  def list_token_tokenids2(address_hash, contract_addresses) do
+    if length(contract_addresses)==0 do
+      []
+    else
+      sub_query=
+        from(
+          tt in TokenTransfer,
+          unnest: {tt.token_ids, :t, :i},
+          distinct: {t.token_id, tt.token_contract_address_hash},
+          order_by: [asc: t.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
+          select:
+            %{
+              token_contract_address_hash: tt.token_contract_address_hash,
+              token_id: t.token_id,
+              to_address_hash: tt.to_address_hash
+            }
+        )
+      query=
+        from(
+          tt in sub_query,
+          group_by: tt.token_contract_address_hash,
+          where: tt.to_address_hash == ^address_hash
+          select: %{
+            token_contract_address_hash: tt.token_contract_address_hash,
+            token_ids: array_agg(tt.token_id)
+          }
+        )
+      {:ok, result} = Repo.replica().all(query)
+      Logger.error(fn -> ["token_ids result : ", inspect(result)] end)
+      rows = result.rows
+      Enum.reduce(rows, %{}, fn row, acc ->
+        token_contract_address_hash = row["token_contract_address_hash"]
+        token_ids = row["token_ids"]
+
+        %{acc | token_contract_address_hash => token_ids}
+      end)
+    end
   end
 
   def list_token_tokenids(address_hash, contract_addresses) do
