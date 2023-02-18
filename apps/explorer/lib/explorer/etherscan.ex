@@ -400,7 +400,7 @@ defmodule Explorer.Etherscan do
 
       sub_query=
         from(
-          tt in token_ids_query,
+          tt in subquery(token_ids_query),
           distinct: [tt.token_contract_address_hash, tt.token_id],
           order_by: [asc: tt.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
           select:
@@ -413,7 +413,7 @@ defmodule Explorer.Etherscan do
 
       query=
         from(
-          x in sub_query,
+          x in subquery(sub_query),
           group_by: x.token_contract_address_hash,
           where: x.to_address_hash == ^address_hash,
           select: %{
