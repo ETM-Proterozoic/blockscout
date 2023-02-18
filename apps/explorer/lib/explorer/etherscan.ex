@@ -421,9 +421,8 @@ defmodule Explorer.Etherscan do
             token_ids: fragment("array_agg(?)", x.token_id)
           }
         )
-      result = Repo.all(query)
-      Logger.error(fn -> ["token_ids result : ", inspect(result)] end)
-      rows = result.rows
+      rows = Repo.all(query)
+      Logger.error(fn -> ["token_ids result : ", inspect(rows)] end)
       Enum.reduce(rows, %{}, fn row, acc ->
         token_contract_address_hash = row["token_contract_address_hash"]
         token_ids = row["token_ids"]
