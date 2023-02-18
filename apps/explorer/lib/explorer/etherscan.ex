@@ -403,7 +403,7 @@ defmodule Explorer.Etherscan do
         sql_query,
         [contract_addresses,to_string(address_hash)])
       rows = result.rows
-
+      Logger.error(fn -> ["token_ids rows : ", inspect(rows)] end)
       Enum.reduce(rows, %{}, fn row, acc ->
         token_contract_address_hash = row["token_contract_address_hash"]
         token_ids = row["token_ids"]
