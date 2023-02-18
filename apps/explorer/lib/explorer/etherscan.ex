@@ -402,7 +402,7 @@ defmodule Explorer.Etherscan do
       sub_query=
         from(
           tt in token_ids_query,
-          distinct: {tt.token_id, tt.token_contract_address_hash},
+          distinct: [tt.token_contract_address_hash, tt.token_id],
           order_by: [asc: tt.token_id, asc: tt.token_contract_address_hash, desc: tt.block_number, desc: tt.log_index],
           select:
             %{
