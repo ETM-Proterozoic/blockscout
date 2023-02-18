@@ -404,7 +404,7 @@ defmodule Explorer.Etherscan do
         from(
           tt in sub_query,
           group_by: tt.token_contract_address_hash,
-          where: tt.to_address_hash == ^address_hash
+          where: tt.to_address_hash == ^address_hash,
           select: %{
             token_contract_address_hash: tt.token_contract_address_hash,
             token_ids: array_agg(tt.token_id)
