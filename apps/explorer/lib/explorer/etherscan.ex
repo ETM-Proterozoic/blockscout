@@ -5,6 +5,7 @@ defmodule Explorer.Etherscan do
 
   import Ecto.Query, only: [from: 2, where: 3, or_where: 3, union: 2, subquery: 1, order_by: 3]
   import Map
+  import Ecto.SQL
 
   require Logger
 
