@@ -348,7 +348,8 @@ defmodule Explorer.Etherscan do
     else
       Logger.error("api 0: results is nil")
     end
-    results_contracts = results |> Enum.map(&String.replace(to_string(&1.contract_address_hash),~r/^0x/, "\\x")) |> Enum.into([])
+
+    results_contracts = results |> Enum.map(&to_string(&1.contract_address_hash)) |> Enum.into([])
     if results do
       Logger.error(fn -> ["api 1: ", inspect(results_contracts)] end)
     else
@@ -400,7 +401,7 @@ defmodule Explorer.Etherscan do
       {:ok, result} = SQL.query(
         Repo,
         sql_query,
-        [contract_addresses,String.replace(to_string(address_hash),~r/^0x/, "\\x")])
+        [contract_addresses,to_string(address_hash)])
       rows = result.rows
 
       Enum.reduce(rows, %{}, fn row, acc ->
