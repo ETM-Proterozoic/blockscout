@@ -419,7 +419,7 @@ defmodule Explorer.Etherscan do
           where: x.to_address_hash == ^address_hash,
           select: %{
             token_contract_address_hash: x.token_contract_address_hash,
-            token_ids: fragment("array_agg(?)", x.token_id)
+            token_ids: fragment("array_agg(CAST(? as INTEGER))", x.token_id)
           }
         )
       rows = Repo.all(query)
