@@ -389,7 +389,7 @@ defmodule Explorer.Etherscan do
 
   def list_token_tokenids2(address_hash, contract_addresses) do
     if length(contract_addresses)==0 do
-      []
+      %{}
     else
       token_ids_query =
         from(
@@ -437,7 +437,7 @@ defmodule Explorer.Etherscan do
 
   def list_token_tokenids(address_hash, contract_addresses) do
     if length(contract_addresses)==0 do
-      []
+      %{}
     else
       sql_query="SELECT token_contract_address_hash, array_agg(token_id) AS token_ids
       FROM (
