@@ -156,8 +156,8 @@ defmodule Explorer.Etherscan do
 
     consensus_blocks =
       from(
-        b in Block,
-        where: b.consensus == true
+        block in Block,
+        where: block.consensus == true
       )
 
     if direction == nil do
