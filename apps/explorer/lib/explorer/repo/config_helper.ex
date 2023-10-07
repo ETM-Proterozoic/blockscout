@@ -36,7 +36,7 @@ defmodule Explorer.Repo.ConfigHelper do
 
   # sobelow_skip ["DOS.StringToAtom"]
   defp extract_parameters(database_url) do
-    ~r/\w*:\/\/(?<username>\w+):(?<password>[a-zA-Z0-9-*#!%^&$_]*)?@(?<hostname>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])):(?<port>\d+)\/(?<database>[a-zA-Z0-9_-]*)/
+    ~r/\w*:\/\/(?<username>[a-zA-Z0-9_-]*):(?<password>[a-zA-Z0-9-*#!%^&$_.]*)?@(?<hostname>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])):(?<port>\d+)\/(?<database>[a-zA-Z0-9_-]*)/
     |> Regex.named_captures(database_url)
     |> Keyword.new(fn {k, v} -> {String.to_atom(k), v} end)
     |> Keyword.put(:url, database_url)
@@ -56,6 +56,17 @@ defmodule Explorer.Repo.ConfigHelper do
     path = System.get_env("NETWORK_PATH", "/")
 
     path_from_env(path)
+  end
+
+  @doc """
+  Defines http port of the application
+  """
+  @spec get_port() :: non_neg_integer()
+  def get_port do
+    case System.get_env("PORT") && Integer.parse(System.get_env("PORT")) do
+      {port, _} -> port
+      _ -> 4000
+    end
   end
 
   defp path_from_env(path_env_var) do

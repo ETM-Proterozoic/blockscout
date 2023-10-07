@@ -3,6 +3,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
   alias BlockScoutWeb.Models.UserFromAuth
   alias Explorer.{Chain, Repo}
+  alias Explorer.Chain.Address.Counters
 
   alias Explorer.Chain.{
     Address,
@@ -159,9 +160,9 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
       insert(:block, miner: address)
 
-      Chain.transaction_count(address)
-      Chain.token_transfers_count(address)
-      Chain.gas_usage_count(address)
+      Counters.transaction_count(address)
+      Counters.token_transfers_count(address)
+      Counters.gas_usage_count(address)
 
       request = get(conn, "/api/v2/addresses/#{address.hash}/counters")
 
@@ -1534,21 +1535,29 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
       ctbs_erc_20 =
         for _ <- 0..50 do
-          insert(:address_current_token_balance_with_token_id, address: address, token_type: "ERC-20", token_id: nil)
+          insert(:address_current_token_balance_with_token_id_and_fixed_token_type,
+            address: address,
+            token_type: "ERC-20",
+            token_id: nil
+          )
           |> Repo.preload([:token])
         end
-        |> Enum.sort_by(fn x -> x.value end, :asc)
+        |> Enum.sort_by(fn x -> Decimal.to_float(Decimal.mult(x.value, x.token.fiat_value)) end, :asc)
 
       ctbs_erc_721 =
         for _ <- 0..50 do
-          insert(:address_current_token_balance_with_token_id, address: address, token_type: "ERC-721", token_id: nil)
+          insert(:address_current_token_balance_with_token_id_and_fixed_token_type,
+            address: address,
+            token_type: "ERC-721",
+            token_id: nil
+          )
           |> Repo.preload([:token])
         end
         |> Enum.sort_by(fn x -> x.value end, :asc)
 
       ctbs_erc_1155 =
         for _ <- 0..50 do
-          insert(:address_current_token_balance_with_token_id,
+          insert(:address_current_token_balance_with_token_id_and_fixed_token_type,
             address: address,
             token_type: "ERC-1155",
             token_id: Enum.random(1..100_000)
@@ -1728,6 +1737,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     assert to_string(log.data) == json["data"]
     assert Address.checksum(log.address_hash) == json["address"]["hash"]
     assert to_string(log.transaction_hash) == json["tx_hash"]
+    assert json["block_number"] == log.block_number
+    assert json["block_hash"] == to_string(log.block_hash)
   end
 
   defp compare_item(%Withdrawal{} = withdrawal, json) do
@@ -1745,6 +1756,11 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     compare_item(Enum.at(list, 0), Enum.at(second_page_resp["items"], 0))
   end
 
+  # with the current implementation no transfers should come with list in totals
+  def check_total(%Token{type: nft}, json, _token_transfer) when nft in ["ERC-721", "ERC-1155"] and is_list(json) do
+    false
+  end
+
   def check_total(%Token{type: nft}, json, token_transfer) when nft in ["ERC-1155"] do
     json["token_id"] in Enum.map(token_transfer.token_ids, fn x -> to_string(x) end) and
       json["value"] == to_string(token_transfer.amount)
@@ -1752,11 +1768,6 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
   def check_total(%Token{type: nft}, json, token_transfer) when nft in ["ERC-721"] do
     json["token_id"] in Enum.map(token_transfer.token_ids, fn x -> to_string(x) end)
-  end
-
-  # with the current implementation no transfers should come with list in totals
-  def check_total(%Token{type: nft}, json, _token_transfer) when nft in ["ERC-721", "ERC-1155"] and is_list(json) do
-    false
   end
 
   def check_total(_, _, _), do: true

@@ -4,6 +4,7 @@ defmodule Explorer.Etherscan do
   """
 
   import Ecto.Query
+  import Explorer.Chain.SmartContract, only: [burn_address_hash_string: 0]
   import Map
 
   require Logger
@@ -25,8 +26,6 @@ defmodule Explorer.Etherscan do
     start_timestamp: nil,
     end_timestamp: nil
   }
-
-  @burn_address_hash_str "0x0000000000000000000000000000000000000000"
 
   @doc """
   Returns the maximum allowed page size number.
@@ -684,7 +683,7 @@ defmodule Explorer.Etherscan do
 
   @spec fetch_sum_coin_total_supply_minus_burnt() :: non_neg_integer
   def fetch_sum_coin_total_supply_minus_burnt do
-    {:ok, burn_address_hash} = Chain.string_to_address_hash(@burn_address_hash_str)
+    {:ok, burn_address_hash} = Chain.string_to_address_hash(burn_address_hash_string())
 
     query =
       from(
